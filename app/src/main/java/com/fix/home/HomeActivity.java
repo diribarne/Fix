@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide;
 import com.fix.BuildConfig;
 import com.fix.FixAbstractActivity;
 import com.fix.R;
+import com.fix.detail.DetailActivity;
 import com.fix.model.FixUser;
 import com.fix.network.FixAPI;
 
@@ -101,7 +102,9 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
                 container.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
+                        Intent i = new Intent(HomeActivity.this, DetailActivity.class);
+                        i.putExtra("user", (FixUser) view.getTag());
+                        startActivity(i);
                     }
                 });
             }
@@ -123,10 +126,10 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
                     .load(fixUser.getThumb())
                     .centerCrop().placeholder(R.drawable.ic_empty_avatar_48)
                     .into(holder.thumb);
+            holder.container.setTag(fixUser);
 
         }
 
-        // Return the size of your dataset (invoked by the layout manager)
         @Override
         public int getItemCount() {
             return data.size();
