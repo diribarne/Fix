@@ -6,7 +6,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.content.res.AppCompatResources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -121,7 +123,8 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
             holder.name.setText(fixUser.getName());
             Glide.with(getBaseContext())
                     .load(fixUser.getThumb())
-                    .centerCrop().error(R.drawable.ic_empty_avatar_48)
+                    //USE BASECONTEXT.getDrawable because Api 17 glide issue
+                    .centerCrop().error(AppCompatResources.getDrawable(getBaseContext(),R.drawable.ic_empty_avatar_48))
                     .into(holder.thumb);
             holder.container.setTag(fixUser);
 
