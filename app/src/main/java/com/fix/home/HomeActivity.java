@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -28,23 +29,23 @@ import java.util.List;
 public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> implements HomeView {
     Snackbar errorSnack;
     RecyclerView contactList;
-
+    SwipeRefreshLayout swipeRefreshLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         contactList = (RecyclerView) findViewById(R.id.contactList);
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
         contactList.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View view) {
-                sendEmail();
+            public void onRefresh() {
+                getPresenter().getContact();
             }
         });
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         errorSnack = Snackbar.make(contactList, getString(R.string.connection_error), Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,14 +64,6 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
 
 
     @Override
-    public void sendEmail() {
-        Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                "mailto", "diribarne90@gmail.com", null));
-        emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.contact_msg));
-        startActivity(Intent.createChooser(emailIntent, "Send email..."));
-    }
-
-    @Override
     public void showContactList(List<FixUser> userList) {
         contactList.setAdapter(new ContactAdapter(userList));
     }
@@ -78,6 +71,11 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
     @Override
     public void showError() {
         errorSnack.show();
+    }
+
+    @Override
+    public void showProgress(Boolean isShow) {
+        swipeRefreshLayout.setRefreshing(isShow);
     }
 
 

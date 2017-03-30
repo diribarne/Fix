@@ -25,17 +25,22 @@ public class HomePresenter extends MvpBasePresenter<HomeView> {
     }
 
     public void getContact() {
+        getView().showProgress(true);
         fixAPI.contacts().enqueue(new Callback<List<FixUser>>() {
             @Override
             public void onResponse(Call<List<FixUser>> call, Response<List<FixUser>> response) {
-                if (isViewAttached())
+                if (isViewAttached()) {
                     getView().showContactList(response.body());
+                    getView().showProgress(false);
+                }
             }
 
             @Override
             public void onFailure(Call<List<FixUser>> call, Throwable t) {
-                if (isViewAttached())
+                if (isViewAttached()) {
                     getView().showError();
+                    getView().showProgress(false);
+                }
             }
         });
     }

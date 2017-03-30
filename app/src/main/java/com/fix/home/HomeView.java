@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface HomeView extends MvpView {
 
-    void sendEmail();
     void showContactList(List<FixUser> userList);
     void showError();
+    void showProgress(Boolean isShow);
 }
