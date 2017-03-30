@@ -45,7 +45,6 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
                 getPresenter().getContact();
             }
         });
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         errorSnack = Snackbar.make(contactList, getString(R.string.connection_error), Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
             @Override
             public void onClick(View view) {
