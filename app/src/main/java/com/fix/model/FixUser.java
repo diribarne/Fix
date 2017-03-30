@@ -15,7 +15,16 @@ public class FixUser implements  Parcelable {
     String thumb;
     String photo;
     String birth_date;
+    List<Address> addresses;
 
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
 
     public List<Phone> getPhones() {
         return phones;
@@ -50,6 +59,12 @@ public class FixUser implements  Parcelable {
         thumb = in.readString();
         photo = in.readString();
         birth_date = in.readString();
+        if (in.readByte() == 0x01) {
+            addresses = new ArrayList<Address>();
+            in.readList(addresses, Address.class.getClassLoader());
+        } else {
+            addresses = null;
+        }
     }
 
     @Override
@@ -71,6 +86,12 @@ public class FixUser implements  Parcelable {
         dest.writeString(thumb);
         dest.writeString(photo);
         dest.writeString(birth_date);
+        if (addresses == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeList(addresses);
+        }
     }
 
     @SuppressWarnings("unused")

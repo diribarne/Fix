@@ -124,7 +124,7 @@ public class HomeActivity extends FixAbstractActivity<HomeView, HomePresenter> i
             holder.name.setText(fixUser.getName());
             Glide.with(getBaseContext())
                     .load(fixUser.getThumb())
-                    .centerCrop().placeholder(R.drawable.ic_empty_avatar_48)
+                    .centerCrop().error(R.drawable.ic_empty_avatar_48)
                     .into(holder.thumb);
             holder.container.setTag(fixUser);
 

@@ -1,13 +1,13 @@
 package com.fix.detail;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +20,7 @@ import com.fix.FixAbstractActivity;
 import com.fix.R;
 import com.fix.home.HomeActivity;
 import com.fix.home.HomePresenter;
+import com.fix.model.Address;
 import com.fix.model.DetailItem;
 import com.fix.model.FixUser;
 import com.fix.model.Phone;
@@ -33,6 +34,9 @@ public class DetailActivity extends FixAbstractActivity<DetailView, DetailPresen
     ImageView photo;
     RecyclerView list;
     private Toolbar toolbar;
+    private Snackbar errorSnack;
+    private FixUser user;
+    private DetailAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,9 +47,20 @@ public class DetailActivity extends FixAbstractActivity<DetailView, DetailPresen
 
         list.setLayoutManager(new LinearLayoutManager(getBaseContext()));
         photo = (ImageView) findViewById(R.id.photo);
-        fillData((FixUser) getIntent().getParcelableExtra("user"));
+        user = getIntent().getParcelableExtra("user");
+        errorSnack = Snackbar.make(list, getString(R.string.connection_error), Snackbar.LENGTH_INDEFINITE).setAction(getString(R.string.retry), new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getPresenter().getContact(user.getUser_id());
+            }
+        });
+        fillData(user);
+        getPresenter().getContact(user.getUser_id());
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
     }
+
 
     @Override
     public void fillData(FixUser fixUser) {
@@ -59,7 +74,28 @@ public class DetailActivity extends FixAbstractActivity<DetailView, DetailPresen
         if (fixUser.getBirth_date() != null) {
             detailItems.add(new DetailItem(fixUser.getBirth_date(), R.drawable.ic_cake_24dp));
         }
-        list.setAdapter(new DetailAdapter(detailItems));
+        adapter = new DetailAdapter(detailItems);
+        list.setAdapter(adapter);
+    }
+
+    @Override
+    public void fillAddresss(FixUser fixUser) {
+        List<DetailItem> detailItems = new ArrayList<>();
+        if (fixUser.getAddresses() != null && !fixUser.getAddresses().isEmpty())
+            for (Address address : fixUser.getAddresses()) {
+                if (!TextUtils.isEmpty(address.getWork())) {
+                    detailItems.add(new DetailItem(address.getWork(), R.drawable.ic_work_24dp));
+                }
+                if (!TextUtils.isEmpty(address.getHome())) {
+                    detailItems.add(new DetailItem(address.getHome(), R.drawable.ic_domain__24dp));
+                }
+            }
+        adapter.addData(detailItems);
+    }
+
+    @Override
+    public void showError() {
+        errorSnack.show();
     }
 
     @NonNull
@@ -102,6 +138,12 @@ public class DetailActivity extends FixAbstractActivity<DetailView, DetailPresen
             DetailItem item = data.get(position);
             holder.value.setText(item.getName());
             holder.logo.setImageResource(item.getResource());
+
+        }
+
+        public void addData(List<DetailItem> items) {
+            data.addAll(items);
+            notifyItemInserted(data.size());
 
         }
 
